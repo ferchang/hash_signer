@@ -8,14 +8,61 @@ require 'func_random.php';
 
 if(isset($_POST['output'])) {
 
-	echo '<pre>';
-	print_r($_POST);
+	//echo '<pre>';
+	//print_r($_POST);
 	
 	$commits=unserialize(base64_decode($_POST['commits']));
 
-	echo '<br>';
-	print_r($commits);
+	//echo '<br>';
+	//print_r($commits);
+	
+	require 'func_process_separator.php';
+	
+	$fs=process_separator($_POST['fs'], $_POST['fs_custom']);
+	$rs=process_separator($_POST['rs'], $_POST['rs_custom']);
+	
+	//-----------------------------------
+	
+	$out=array();
+		
+	$out['all']='';
+	foreach($commits as $k=>$v) {
+		
+		if($out['all']!=='') $out['all'].=$rs;
+		$out['all'].=$v['data'].$fs.$v['salt'].$fs.$v['hash'];
+		
+	}
+
+	//-----------------------------------
+	
+	$out['private']='';
+	foreach($commits as $k=>$v) {
+		
+		if($out['private']!=='') $out['private'].=$rs;
+		$out['private'].=$v['data'].$fs.$v['salt'];
+		
+	}	
+	
+	//-----------------------------------
+	
+	$out['public']='';
+	foreach($commits as $k=>$v) {
+		
+		if($out['public']!=='') $out['public'].=$rs;
+		$out['public'].=$v['hash'];
+		
+	}
+	
+	//-----------------------------------
+	
+	require 'page_custom_output.php';
+	
+	//echo "<pre>$out</pre>";
+	
+	//file_put_contents('out.txt', $out);
+	
 	exit;
+	
 }
 
 if(isset($_POST['gen_commits'])) {
